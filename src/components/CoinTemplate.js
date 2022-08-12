@@ -33,7 +33,6 @@ const CoinTemplate = () => {
 
   const [btcPrice, setBtcPrice] = useState(null);
   const [, setLoading] = useState(false);
-  const [temp, setTemp] = useState([]);
 
   const getMarkets = useCallback(async () => {
     setLoading(true);
@@ -45,30 +44,6 @@ const CoinTemplate = () => {
     }
     setLoading(false);
   }, [setMarkets]);
-
-  const sortCoin = useCallback(() => {
-    const temp = [...coins];
-    if (tradePriceSort) {
-      if (tradePriceSort === "ascending") {
-        temp.sort((a, b) => a.trade_price - b.trade_price);
-      } else {
-        temp.sort((a, b) => b.trade_price - a.trade_price);
-      }
-    } else if (prevClosingPriceSort) {
-      if (prevClosingPriceSort === "ascending") {
-        temp.sort((a, b) => a.signed_change_rate - b.signed_change_rate);
-      } else {
-        temp.sort((a, b) => b.signed_change_rate - a.signed_change_rate);
-      }
-    } else {
-      if (accTradePriceSort === "ascending") {
-        temp.sort((a, b) => a.acc_trade_price_24h - b.acc_trade_price_24h);
-      } else {
-        temp.sort((a, b) => b.acc_trade_price_24h - a.acc_trade_price_24h);
-      }
-    }
-    setTemp((prev) => [...temp]);
-  }, [setTemp, coins, tradePriceSort, prevClosingPriceSort, accTradePriceSort]);
 
   const getCoins = useCallback(async () => {
     setLoading(true);
@@ -94,7 +69,6 @@ const CoinTemplate = () => {
       setAccTradePriceSort(null);
       setTradePriceSort("descending");
     }
-    sortCoin();
   };
   const sortByPrevClosingPrice = () => {
     if (prevClosingPriceSort) {
@@ -108,7 +82,6 @@ const CoinTemplate = () => {
       setAccTradePriceSort(null);
       setPrevClosingPriceSort("descending");
     }
-    sortCoin();
   };
   const sortByAccTradePrice = () => {
     if (accTradePriceSort) {
@@ -122,7 +95,6 @@ const CoinTemplate = () => {
       setPrevClosingPriceSort(null);
       setAccTradePriceSort("descending");
     }
-    sortCoin();
   };
 
   useEffect(() => {
@@ -139,9 +111,8 @@ const CoinTemplate = () => {
   useEffect(() => {
     if (coins) {
       setBtcPrice(coins.find((coin) => coin.market === "KRW-BTC").trade_price);
-      sortCoin();
     }
-  }, [coins, setBtcPrice, sortCoin]);
+  }, [coins, setBtcPrice]);
 
   return (
     <CoinTemplateBlock>
@@ -157,7 +128,7 @@ const CoinTemplate = () => {
             path="/"
             element={
               <CoinList
-                coins={temp.filter(({ market }) => market.startsWith("KRW"))}
+                coins={coins.filter(({ market }) => market.startsWith("KRW"))}
                 price={1}
               />
             }
@@ -166,7 +137,7 @@ const CoinTemplate = () => {
             path="/BTC"
             element={
               <CoinList
-                coins={temp.filter(({ market }) => market.startsWith("BTC"))}
+                coins={coins.filter(({ market }) => market.startsWith("BTC"))}
                 price={btcPrice}
               />
             }
@@ -175,7 +146,7 @@ const CoinTemplate = () => {
             path="/USDT"
             element={
               <CoinList
-                coins={temp.filter(({ market }) => market.startsWith("USDT"))}
+                coins={coins.filter(({ market }) => market.startsWith("USDT"))}
                 price={1301.35}
               />
             }
